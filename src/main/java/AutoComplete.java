@@ -65,20 +65,32 @@ public class AutoComplete {
 
         List<String> userImportClasses = getUserImportClases(code);
         List<String> userClasses = getUserClasses(code);
-        Set<String> classesForAnalisys = new HashSet<>();
 
 
-        for (String userClass : userClasses)
-            for (String userImportClass : userImportClasses)
-                if (userImportClass.endsWith(userClass))
-                    classesForAnalisys.add(userImportClass);
+
+        Set<String> classesForAnalisys = deleteDublicates(userImportClasses, userClasses);
 
         for (String classs : classesForAnalisys) {
             Method[] methods = getMethods(classs);
             System.out.println("\nFor class = " + classs + " Found " + methods.length + " methods");
+            for (Method method : methods) {
+                System.out.println("method = " + method);
+            }
             Arrays.stream(methods).forEach(System.out::println);
         }
 
+    }
+
+    private Set<String> deleteDublicates(List<String> userImportClasses, List<String> userClasses) {
+        Set<String> classesForAnalisys = new HashSet<>();
+        for (String userClass : userClasses)
+            for (String userImportClass : userImportClasses) {
+                String[] split = userImportClass.replace(".", " ").split(" ");
+                String userImportType = split[split.length - 1];
+                if (userImportType.equals(userClass))
+                    classesForAnalisys.add(userImportClass);
+            }
+        return classesForAnalisys;
     }
 
     private Method[] getMethods(String classs) throws Exception {
@@ -99,13 +111,13 @@ public class AutoComplete {
     }
 
     private List<String> getUserClasses(String code) {
-        String regexp = "(.*) *([A-z]*) *=";
+        String regexp = "(.*) (.*)=";
         Pattern pattern = Pattern.compile(regexp);
         Matcher matcher = pattern.matcher(code);
         List<String> classes = new ArrayList<>();
 
         while (matcher.find()) {
-            String classs = matcher.group(1).trim().split(" ")[0].trim();
+            String classs = matcher.group(1).trim().split(" ")[0].trim().split("<")[0];
             classes.add(classs);
         }
         return classes;
