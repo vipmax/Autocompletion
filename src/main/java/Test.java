@@ -1,4 +1,3 @@
-import org.apache.spark.SparkConf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,6 @@ public class Test {
         List<String> list = new ArrayList<>();
         ArrayList<String> alist = new ArrayList<>();
 
-        SparkConf sparkConf =  new SparkConf();
 
 
     }

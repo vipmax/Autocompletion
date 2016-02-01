@@ -73,9 +73,6 @@ public class AutoComplete {
         for (String classs : classesForAnalisys) {
             Method[] methods = getMethods(classs);
             System.out.println("\nFor class = " + classs + " Found " + methods.length + " methods");
-            for (Method method : methods) {
-                System.out.println("method = " + method);
-            }
             Arrays.stream(methods).forEach(System.out::println);
         }
 
