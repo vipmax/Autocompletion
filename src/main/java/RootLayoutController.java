@@ -1,7 +1,15 @@
+import com.sun.org.apache.xpath.internal.SourceTree;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.apache.commons.io.FileUtils;
@@ -12,7 +20,7 @@ import java.util.LinkedHashMap;
 public class RootLayoutController {
 
     @FXML
-    private TreeView<File> treeView;
+    private TreeView<CustomItem> treeView;
     @FXML
     private TextArea textArea;
     private LinkedHashMap listFiles;
@@ -26,6 +34,16 @@ public class RootLayoutController {
         root.setExpanded(true);
     }
 
+    private void addFilesToTreeView (File file) {
+
+//        TreeItem<String> root = new TreeItem<String>("Root Node");
+//        root.setExpanded(true);
+//        for (String itemString: rootItems) {
+//            root.getChildren().add(new TreeItem<String>(itemString));
+//        }
+//
+//        treeView.setRoot(root);
+    }
 
 
     @FXML
@@ -59,14 +77,14 @@ public class RootLayoutController {
     }
 
 
-    private void findFiles(File dir, TreeItem<File> parent) {
-        TreeItem<File> root = new TreeItem<>(dir);
+    private void findFiles(File dir, TreeItem<CustomItem> parent) {
+        TreeItem<CustomItem> root = new TreeItem<>(new CustomItem(dir.getName(), dir));
         root.setExpanded(false);
         File[] files = dir.listFiles();
         assert files != null;
         for (File file : files)
             if (file.isDirectory()) findFiles(file, root);
-            else root.getChildren().add(new TreeItem<>(file));
+            else root.getChildren().add(new TreeItem<>(new CustomItem(file.getName(), file)));
 
         if(parent==null) treeView.setRoot(root);
         else parent.getChildren().add(root);
@@ -95,9 +113,9 @@ public class RootLayoutController {
 
     @FXML
     private void onClicked() throws IOException {
-        TreeItem<File> selectedItem = treeView.getSelectionModel().getSelectedItem();
-        if (selectedItem != null && selectedItem.getValue().isFile())
-            textArea.setText(FileUtils.readFileToString(selectedItem.getValue()));
+        TreeItem<CustomItem> selectedItem = treeView.getSelectionModel().getSelectedItem();
+        if (selectedItem != null && selectedItem.getValue().getFile().isFile())
+            textArea.setText(FileUtils.readFileToString(selectedItem.getValue().getFile()));
     }
 
 
