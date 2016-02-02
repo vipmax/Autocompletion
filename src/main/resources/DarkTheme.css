@@ -1,0 +1,43 @@
+
+.background {
+    -fx-background-color: #1d1d1d;
+}
+
+
+.split-pane:horizontal > .split-pane-divider {
+    -fx-border-color: transparent #1d1d1d transparent #1d1d1d;
+    -fx-background-color: transparent, derive(#1d1d1d,20%);
+}
+
+
+.split-pane {
+    -fx-padding: 1 0 0 0;
+}
+
+
+.menu-bar {
+    -fx-background-color: #1d1d1d;
+}
+
+.context-menu {
+    -fx-background-color: #1d1d1d;
+}
+
+.menu-bar .label {
+    -fx-font-size: 14pt;
+    -fx-font-family: "Segoe UI Light";
+    -fx-text-fill: white;
+    -fx-opacity: 0.9;
+}
+
+.menu .centre-container {
+    -fx-background-color: black;
+}
+
+.text-field {
+    -fx-font-size: 12pt;
+    -fx-font-family: "Segoe UI Semibold";
+}
+
+
+

@@ -116,8 +116,8 @@ public class RootLayoutController {
         showSelectedFile();
     }
 
-    public void onKeyPressed(Event event) throws IOException {
-        showSelectedFile();
+    public void onKeyPressed(KeyEvent event) throws IOException {
+        if(event.getCode()==KeyCode.ENTER) showSelectedFile();
     }
 
     private void showSelectedFile() throws IOException {

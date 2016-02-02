@@ -1,50 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.lang.*?>
+<?import java.net.*?>
 <?import java.util.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.*?>
 
-<BorderPane prefHeight="609.0" prefWidth="937.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RootLayoutController">
+<BorderPane prefHeight="609.0" prefWidth="937.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="RootLayoutController">
   <center>
-    <SplitPane dividerPositions="0.2725752508361204" focusTraversable="true" prefHeight="160.0" prefWidth="200.0">
+    <SplitPane dividerPositions="0.2700106723585913" focusTraversable="true" prefHeight="160.0" prefWidth="200.0">
       <items>
-        <AnchorPane maxWidth="-1.0" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+        <AnchorPane cache="false" disable="false" maxWidth="-1.0" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" style="" styleClass="background">
           <children>
-            <TreeView fx:id="treeView" onKeyPressed="#onKeyPressed" onMouseClicked="#onClicked" prefHeight="374.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <TreeView fx:id="treeView" editable="false" onKeyPressed="#onKeyPressed" onMouseClicked="#onClicked" prefHeight="374.0" prefWidth="100.0" style="" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
           </children>
+          <stylesheets>
+            <URL value="@DarkTheme.css" />
+          </stylesheets>
         </AnchorPane>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
           <children>
-            <TextArea fx:id="textArea" prefHeight="374.0" prefWidth="492.0" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <TextArea fx:id="textArea" prefHeight="374.0" prefWidth="492.0" style="" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
           </children>
         </AnchorPane>
       </items>
     </SplitPane>
   </center>
+  <stylesheets>
+    <URL value="@DarkTheme.css" />
+  </stylesheets>
   <top>
     <MenuBar BorderPane.alignment="CENTER">
       <menus>
-        <Menu fx:id="ButtonFile" mnemonicParsing="false" text="File">
+        <Menu mnemonicParsing="false" text="File" fx:id="ButtonFile">
           <items>
-            <MenuItem fx:id="ButtonNewFile" mnemonicParsing="false" onAction="#createFile" text="New File" />
-            <MenuItem fx:id="ButtonOpenFile" mnemonicParsing="false" onAction="#openFile" text="Open File" />
-            <MenuItem fx:id="ButtonOpenFolder" mnemonicParsing="false" onAction="#openFolder" text="Open Folder" />
-            <MenuItem fx:id="ButtonSave" mnemonicParsing="false" onAction="#saveFile" text="Save" />
-            <MenuItem fx:id="ButtonSaveAll" mnemonicParsing="false" onAction="#saveAllFiles" text="Save All" />
-            <MenuItem fx:id="ButtonSaveAs" mnemonicParsing="false" onAction="#saveAs" text="Save As..." />
-            <MenuItem fx:id="ButtonExit" mnemonicParsing="false" onAction="#exitFromProgram" text="Exit" />
+            <MenuItem mnemonicParsing="false" onAction="#createFile" text="New File" fx:id="ButtonNewFile" />
+            <MenuItem mnemonicParsing="false" onAction="#openFile" text="Open File" fx:id="ButtonOpenFile" />
+            <MenuItem mnemonicParsing="false" onAction="#openFolder" text="Open Project" fx:id="ButtonOpenFolder" />
+            <MenuItem mnemonicParsing="false" onAction="#exitFromProgram" text="Exit" fx:id="ButtonExit" />
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Edit">
           <items>
-            <MenuItem fx:id="ButtonDelete" mnemonicParsing="false" onAction="#delete" text="Delete" />
+            <MenuItem mnemonicParsing="false" onAction="#delete" text="Delete" fx:id="ButtonDelete" />
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
           <items>
-            <MenuItem fx:id="ButtonAbout" mnemonicParsing="false" text="About" />
+            <MenuItem mnemonicParsing="false" text="About" fx:id="ButtonAbout" />
           </items>
         </Menu>
       </menus>
