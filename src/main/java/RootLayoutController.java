@@ -119,4 +119,9 @@ public class RootLayoutController {
     }
 
 
+    public void onKeyPressed(Event event) throws IOException {
+        TreeItem<CustomItem> selectedItem = treeView.getSelectionModel().getSelectedItem();
+        if (selectedItem != null && selectedItem.getValue().getFile().isFile())
+            textArea.setText(FileUtils.readFileToString(selectedItem.getValue().getFile()));
+    }
 }
