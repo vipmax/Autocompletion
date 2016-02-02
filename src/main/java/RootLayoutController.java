@@ -113,13 +113,14 @@ public class RootLayoutController {
 
     @FXML
     private void onClicked() throws IOException {
-        TreeItem<CustomItem> selectedItem = treeView.getSelectionModel().getSelectedItem();
-        if (selectedItem != null && selectedItem.getValue().getFile().isFile())
-            textArea.setText(FileUtils.readFileToString(selectedItem.getValue().getFile()));
+        showSelectedFile();
     }
 
-
     public void onKeyPressed(Event event) throws IOException {
+        showSelectedFile();
+    }
+
+    private void showSelectedFile() throws IOException {
         TreeItem<CustomItem> selectedItem = treeView.getSelectionModel().getSelectedItem();
         if (selectedItem != null && selectedItem.getValue().getFile().isFile())
             textArea.setText(FileUtils.readFileToString(selectedItem.getValue().getFile()));
