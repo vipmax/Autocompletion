@@ -6,9 +6,12 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -23,7 +26,9 @@ public class RootLayoutController {
     private TreeView<CustomItem> treeView;
     @FXML
     private TextArea textArea;
-    private LinkedHashMap listFiles;
+
+
+    Image folderImage = new Image(getClass().getResourceAsStream("folder.png"));
 
     @FXML
     private void createFile() {
@@ -78,7 +83,7 @@ public class RootLayoutController {
 
 
     private void findFiles(File dir, TreeItem<CustomItem> parent) {
-        TreeItem<CustomItem> root = new TreeItem<>(new CustomItem(dir.getName(), dir));
+        TreeItem<CustomItem> root = new TreeItem<>((new CustomItem(dir.getName(), dir)),new ImageView(folderImage));
         root.setExpanded(false);
         File[] files = dir.listFiles();
         assert files != null;
