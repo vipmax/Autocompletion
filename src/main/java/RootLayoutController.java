@@ -120,6 +120,7 @@ public class RootLayoutController {
         if(event.getCode()==KeyCode.ENTER) showSelectedFile();
     }
 
+
     private void showSelectedFile() throws IOException {
         TreeItem<CustomItem> selectedItem = treeView.getSelectionModel().getSelectedItem();
         if (selectedItem != null && selectedItem.getValue().getFile().isFile())
