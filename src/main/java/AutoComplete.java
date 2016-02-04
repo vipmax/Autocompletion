@@ -6,7 +6,10 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -22,6 +25,7 @@ public class AutoComplete {
     public static void main(String[] args) throws Exception {
         AutoComplete autoComplete = new AutoComplete();
         autoComplete.init();
+	// classes.
 
         long startTime = System.nanoTime();
         autoComplete.test(AutoComplete.getUserCode());
@@ -30,13 +34,14 @@ public class AutoComplete {
 
     private static String getUserCode() throws IOException {
         File file = new File("src/main/java/AutoComplete.java");
+//	file.
         String code = FileUtils.readFileToString(file);
         System.out.println(code);
         return code;
     }
 
-
-    private void init() throws IOException, ClassNotFoundException {
+  
+    public void init() throws IOException, ClassNotFoundException {
         initJars("target/deps");
         initJars("/usr/lib/jvm/java-8-oracle/jre/lib/");
         initJars("/usr/lib/jvm/java-8-oracle/jre/lib/ext/");
@@ -63,25 +68,32 @@ public class AutoComplete {
 
     private void test(String code) throws Exception {
 
-        List<String> userImportClasses = getUserImportClases(code);
-        List<String> userClasses = getUserClasses(code);
+//        List<String> userImportClasses = getUserImportClases(code).stream();
+//        List<String> userClasses = getUserClasses(code);
+	
 
 
-
-        Set<String> classesForAnalisys = deleteDublicates(userImportClasses, userClasses);
-        for (String classesForAnalisy : classesForAnalisys) {
-            System.out.println("classesForAnalisy = " + classesForAnalisy);
-        }
-
-        for (String classs : classesForAnalisys) {
-            Method[] methods = getMethods(classs);
-            System.out.println("\nFor class = " + classs + " Found " + methods.length + " methods");
-            Arrays.stream(methods).forEach(System.out::println);
-        }
+//        Set<String> classesForAnalisys = deleteDublicates(userImportClasses, userClasses);
+//        for (String classesForAnalisy : classesForAnalisys) {
+//            System.out.println("classesForAnalisy = " + classesForAnalisy);
+//        }
+//
+//        for (String classs : classesForAnalisys) {
+//            Method[] methods = getMethods(classs);
+//            System.out.println("\nFor class = " + classs + " Found " + methods.length + " methods");
+//            Arrays.stream(methods).forEach(System.out::println);
+//        }
 
     }
 
-    private Set<String> deleteDublicates(List<String> userImportClasses, List<String> userClasses) {
+    public Method[] getMethods(String classs) throws Exception {
+        String jar = classes.get(classs);
+        Class<?> loadClass = new URLClassLoader(new URL[]{new File(jar).toURL()}).loadClass(classs);
+        return loadClass.getDeclaredMethods();
+
+    }
+
+    private Set<String> deleteDublicates(Set<String> userImportClasses, Set<String> userClasses) {
         Set<String> classesForAnalisys = new HashSet<>();
         for (String userClass : userClasses)
             for (String userImportClass : userImportClasses) {
@@ -93,28 +105,22 @@ public class AutoComplete {
         return classesForAnalisys;
     }
 
-    private Method[] getMethods(String classs) throws Exception {
-        String jar = classes.get(classs);
-        Class<?> loadClass = new URLClassLoader(new URL[]{new File(jar).toURL()}).loadClass(classs);
-        return loadClass.getDeclaredMethods();
-
-    }
-
-    private List<String> getUserImportClases(String code) {
+    private Set<String> getUserImportClases(String code) {
         String importRegexp = "import (.*);";
         Pattern pattern = Pattern.compile(importRegexp);
         Matcher matcher = pattern.matcher(code);
-        List<String> imports = new ArrayList<>();
+        Set<String> imports = new HashSet<>();
 
         while (matcher.find()) imports.add(matcher.group(1));
         return imports;
     }
 
-    private List<String> getUserClasses(String code) {
-        String regexp = "([A-z|<|>|, ]+)\\s+([A-z]+)\\s+=\\s+";
+    private Set<String> getUserClasses(String code) {
+        String regexp = "([A-z|<|>|,|?| ]+)\\s+([A-z]+)\\s+=\\s+";
         Pattern pattern = Pattern.compile(regexp);
         Matcher matcher = pattern.matcher(code);
-        List<String> classes = new ArrayList<>();
+
+        Set<String> classes = new HashSet<>();
 
         while (matcher.find()) {
             String group = matcher.group(1);
@@ -122,6 +128,7 @@ public class AutoComplete {
             String references = matcher.group(2).trim();
             classes.add(classs);
         }
+
         return classes;
     }
 }

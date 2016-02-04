@@ -1,16 +1,6 @@
-import com.sun.org.apache.xpath.internal.SourceTree;
-import javafx.application.Platform;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
@@ -21,7 +11,6 @@ import javafx.scene.input.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.apache.commons.io.FileUtils;
-import sun.nio.ch.ThreadPool;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,8 +18,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RootLayoutController implements Initializable {
     @FXML
@@ -43,6 +37,7 @@ public class RootLayoutController implements Initializable {
     private TextArea textArea;
 
 
+    AutoComplete autoComplete = new AutoComplete();
 
     Image folderImage = new Image(getClass().getResourceAsStream("folder.png"));
 
@@ -52,14 +47,14 @@ public class RootLayoutController implements Initializable {
                 File file = treeView.getSelectionModel().getSelectedItem().getValue().getFile();
                 String text = textArea.getText();
                 try {
-                    System.out.println("Write String To File");
+//                    System.out.println("Write String To File");
                     FileUtils.writeStringToFile(file, text);
                 } catch (IOException e) { }
             } catch (Exception e) { }
             try {
-                System.out.println("Sleep");
+//                System.out.println("Sleep");
                 Thread.sleep(10000000);
-            } catch (InterruptedException e) { System.out.println("Interrupt"); }
+            } catch (InterruptedException e) { /*System.out.println("Interrupt");*/ }
         }
     });
 
@@ -68,10 +63,20 @@ public class RootLayoutController implements Initializable {
         savingThread.setDaemon(true);
         savingThread.start();
         textArea.textProperty().addListener((ov, t, t1) -> {
-            System.out.println("Changed.");
+//            System.out.println("Changed.");
             savingThread.interrupt();
         });
         treeView.setRoot(new TreeItem<>(new CustomItem("projects", null), new ImageView(folderImage)));
+
+        new Thread(() -> {
+            try {
+                autoComplete.init();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
 
@@ -192,4 +197,97 @@ public class RootLayoutController implements Initializable {
     }
 
 
+    public void onKeyPressedTextArea(KeyEvent keyEvent) {
+        if (keyEvent.getCode() != KeyCode.PERIOD) return;
+
+        String ref = getCurrentRef();
+        if (ref==null) return;
+
+        String code = textArea.getText();
+        Map<String, String> userClassesAndReferences = getUserClassesAndReferences(code);
+
+        if (userClassesAndReferences.keySet().contains(ref)) {
+            String classWithoutPackage = userClassesAndReferences.get(ref);
+
+            String classWithPackage = addPackage(code, classWithoutPackage);
+
+            try {
+                System.out.println("classWithPackage = " + classWithPackage);
+                System.out.println(Arrays.toString(autoComplete.getMethods(classWithPackage)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private String getCurrentRef() {
+        String code = textArea.getText();
+        int caretPosition = textArea.getCaretPosition();
+        String substring = code.substring(0, caretPosition);
+        StringBuilder reverse = new StringBuilder(substring).reverse();
+
+
+        String regexp = "([A-z]+)";
+        Pattern pattern = Pattern.compile(regexp);
+        Matcher matcher = pattern.matcher(reverse);
+
+        if(matcher.find()) {
+            String revref = matcher.group(1);
+            String ref = new StringBuilder(revref).reverse().toString();
+            System.out.println("ref = " + ref);
+            return ref;
+        }
+        return null;
+    }
+
+    private String addPackage(String code, String classWithoutPackage) {
+        Set<String> userImportClasses = getUserImportClases(code);
+        for (String userImportClass : userImportClasses) {
+            String[] split = userImportClass.replace(".", " ").split(" ");
+            String userImportType = split[split.length - 1];
+            if (userImportType.equals(classWithoutPackage)) {
+               return userImportClass;
+            }
+        }
+        return "Not found";
+    }
+
+    private Set<String> deleteDublicates(Set<String> userImportClasses, Set<String> userClasses) {
+        Set<String> classesForAnalisys = new HashSet<>();
+        for (String userClass : userClasses)
+            for (String userImportClass : userImportClasses) {
+                String[] split = userImportClass.replace(".", " ").split(" ");
+                String userImportType = split[split.length - 1];
+                if (userImportType.equals(userClass))
+                    classesForAnalisys.add(userImportClass);
+            }
+        return classesForAnalisys;
+    }
+
+    private Set<String> getUserImportClases(String code) {
+        String importRegexp = "import (.*);";
+        Pattern pattern = Pattern.compile(importRegexp);
+        Matcher matcher = pattern.matcher(code);
+        Set<String> imports = new HashSet<>();
+
+        while (matcher.find()) imports.add(matcher.group(1));
+        return imports;
+    }
+
+    private Map<String, String> getUserClassesAndReferences(String code) {
+        String regexpForClassAndRef = "([A-z|<|>|,|?| ]+)\\s+([A-z]+)\\s+=\\s+";
+        Pattern pattern = Pattern.compile(regexpForClassAndRef);
+        Matcher matcher = pattern.matcher(code);
+
+        Map<String, String> result = new HashMap<>();
+
+        while (matcher.find()) {
+            String reference = matcher.group(2).trim();
+            String classs = matcher.group(1).split("<")[0].trim();
+            result.put(reference, classs);
+        }
+
+        return result;
+    }
 }
