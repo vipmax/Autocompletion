@@ -29,7 +29,7 @@ public class AutoComplete {
     }
 
     private static String getUserCode() throws IOException {
-        File file = new File("src/main/java/Test.java");
+        File file = new File("src/main/java/AutoComplete.java");
         String code = FileUtils.readFileToString(file);
         System.out.println(code);
         return code;
@@ -69,6 +69,9 @@ public class AutoComplete {
 
 
         Set<String> classesForAnalisys = deleteDublicates(userImportClasses, userClasses);
+        for (String classesForAnalisy : classesForAnalisys) {
+            System.out.println("classesForAnalisy = " + classesForAnalisy);
+        }
 
         for (String classs : classesForAnalisys) {
             Method[] methods = getMethods(classs);
@@ -108,13 +111,15 @@ public class AutoComplete {
     }
 
     private List<String> getUserClasses(String code) {
-        String regexp = "(.*) (.*)=";
+        String regexp = "([A-z|<|>|, ]+)\\s+([A-z]+)\\s+=\\s+";
         Pattern pattern = Pattern.compile(regexp);
         Matcher matcher = pattern.matcher(code);
         List<String> classes = new ArrayList<>();
 
         while (matcher.find()) {
-            String classs = matcher.group(1).trim().split(" ")[0].trim().split("<")[0];
+            String group = matcher.group(1);
+            String classs = group.split("<")[0].trim();
+            String references = matcher.group(2).trim();
             classes.add(classs);
         }
         return classes;
