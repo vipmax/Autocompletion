@@ -7,21 +7,34 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.*?>
 
-<BorderPane prefHeight="609.0" prefWidth="937.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="RootLayoutController">
+<BorderPane prefHeight="554.0" prefWidth="830.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="RootLayoutController">
   <center>
-    <SplitPane dividerPositions="0.2700106723585913" focusTraversable="true" prefHeight="160.0" prefWidth="200.0">
+    <SplitPane id="split" fx:id="splitPane" dividerPositions="0.994392523364486" focusTraversable="true" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
       <items>
-        <AnchorPane cache="false" disable="false" maxWidth="-1.0" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" style="" styleClass="background">
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
           <children>
-            <TreeView fx:id="treeView" editable="false" onKeyPressed="#onKeyPressed" onMouseClicked="#onClicked" prefHeight="374.0" prefWidth="100.0" style="" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <SplitPane dividerPositions="0.21325301204819277" focusTraversable="true" prefHeight="535.0" prefWidth="830.0" AnchorPane.bottomAnchor="-6.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <items>
+                <AnchorPane cache="false" disable="false" maxWidth="-1.0" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" style="" styleClass="background">
+                  <children>
+                    <TreeView fx:id="treeView" editable="false" onKeyPressed="#onKeyPressed" onMouseClicked="#onClicked" prefHeight="534.0" prefWidth="172.0" style="" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  </children>
+                  <stylesheets>
+                    <URL value="@DarkTheme.css" />
+                  </stylesheets>
+                </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                  <children>
+                    <TextArea fx:id="textArea" prefHeight="534.0" prefWidth="648.0" style="" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  </children>
+                </AnchorPane>
+              </items>
+            </SplitPane>
           </children>
-          <stylesheets>
-            <URL value="@DarkTheme.css" />
-          </stylesheets>
         </AnchorPane>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
           <children>
-            <TextArea fx:id="textArea" prefHeight="374.0" prefWidth="492.0" style="" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <TextArea fx:id="outputTextArea" editable="false" minHeight="0.0" prefHeight="0.0" prefWidth="830.0" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
           </children>
         </AnchorPane>
       </items>
@@ -49,6 +62,11 @@
         <Menu mnemonicParsing="false" text="Help">
           <items>
             <MenuItem mnemonicParsing="false" text="About" fx:id="ButtonAbout" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Run">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#onRun" text="Run" />
           </items>
         </Menu>
       </menus>

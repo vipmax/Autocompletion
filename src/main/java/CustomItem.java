@@ -1,3 +1,7 @@
+import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
 import java.io.File;
 
 /**
@@ -11,6 +15,7 @@ public class CustomItem {
         this.viewName = viewName;
         this.file = file;
     }
+
 
     @Override
     public String toString() {
