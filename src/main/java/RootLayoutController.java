@@ -17,12 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +33,7 @@ public class RootLayoutController implements Initializable {
 
 
     AutoComplete autoComplete = new AutoComplete();
+    Map<String, String> mapReferenceAndClass = new HashMap<>();
 
     Image folderImage = new Image(getClass().getResourceAsStream("folder.png"));
 
@@ -242,16 +238,33 @@ public class RootLayoutController implements Initializable {
     }
 
     private String addPackage(String code, String classWithoutPackage) {
+        System.out.println("classWithoutPackage = " + classWithoutPackage);
         Set<String> userImportClasses = getUserImportClases(code);
         for (String userImportClass : userImportClasses) {
+            System.out.println("userImportClass = " + userImportClass);
             String[] split = userImportClass.replace(".", " ").split(" ");
             String userImportType = split[split.length - 1];
             if (userImportType.equals(classWithoutPackage)) {
                return userImportClass;
             }
+            else{
+                 if(userImportClass.endsWith("*")) {
+                     Set<String> keySet = autoComplete.classes.keySet();
+                     for (String key : keySet) {
+                         if (key.startsWith(userImportClass.replace("*", classWithoutPackage)) & key.endsWith(classWithoutPackage)) {
+                             return key;
+                         }
+                     }
+                 }
+
+
+
+            }
+
         }
         return "Not found";
     }
+
 
     private Set<String> deleteDublicates(Set<String> userImportClasses, Set<String> userClasses) {
         Set<String> classesForAnalisys = new HashSet<>();
@@ -280,14 +293,14 @@ public class RootLayoutController implements Initializable {
         Pattern pattern = Pattern.compile(regexpForClassAndRef);
         Matcher matcher = pattern.matcher(code);
 
-        Map<String, String> result = new HashMap<>();
+
 
         while (matcher.find()) {
             String reference = matcher.group(2).trim();
             String classs = matcher.group(1).split("<")[0].trim();
-            result.put(reference, classs);
+            mapReferenceAndClass.put(reference, classs);
         }
 
-        return result;
+        return mapReferenceAndClass;
     }
 }

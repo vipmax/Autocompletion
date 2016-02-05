@@ -1,8 +1,5 @@
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 
 /**
  * Created by max on 31.01.16.
@@ -22,9 +19,8 @@ public class Test {
         alist.add("7");
         alist.add("8");
         alist.add("9");
-        alist.add("10");
         System.out.println("Hello from test");
-
+alist.
         for (String a : alist) {
             System.out.println("a = " + a);
             Thread.sleep(1000);

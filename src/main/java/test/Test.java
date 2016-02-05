@@ -1,7 +1,7 @@
 package test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
 
 /**
  * Created by max on 31.01.16.
@@ -14,6 +14,7 @@ public class Test {
         ArrayList<String> alist = new ArrayList<>();
 
         System.out.println("Hello from test");
+
 
 
     }
