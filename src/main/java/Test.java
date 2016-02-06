@@ -1,4 +1,3 @@
-
 import java.util.*;
 
 /**
@@ -19,8 +18,8 @@ public class Test {
         alist.add("7");
         alist.add("8");
         alist.add("9");
+                                                    
         System.out.println("Hello from test");
-alist.
         for (String a : alist) {
             System.out.println("a = " + a);
             Thread.sleep(1000);

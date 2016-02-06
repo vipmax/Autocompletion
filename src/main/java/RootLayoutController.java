@@ -1,21 +1,30 @@
+import com.sun.deploy.util.StringUtils;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.geometry.Bounds;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -30,10 +39,16 @@ public class RootLayoutController implements Initializable {
     private TreeView<CustomItem> treeView;
     @FXML
     private TextArea textArea;
+    @FXML
+    private AnchorPane anchorPaneForTextArea;
+
+    private ComboBox<String> comboBox;
 
 
     AutoComplete autoComplete = new AutoComplete();
     Map<String, String> mapReferenceAndClass = new HashMap<>();
+    Windows window = new Windows();
+    ChooseDialogController chooseDialogController = new ChooseDialogController();
 
     Image folderImage = new Image(getClass().getResourceAsStream("folder.png"));
 
@@ -62,8 +77,30 @@ public class RootLayoutController implements Initializable {
 //            System.out.println("Changed.");
             savingThread.interrupt();
         });
+//        comboBox.
         treeView.setRoot(new TreeItem<>(new CustomItem("projects", null), new ImageView(folderImage)));
+        comboBox = new ComboBox<>();
+        comboBox.setVisible(false);
+        comboBox.setEditable(true);
+        comboBox.setOnKeyReleased(t -> {
+            comboBox.requestFocus();
+            comboBox.show();
+            for (String item : comboBox.getItems()) {
+                if (item.startsWith(comboBox.getEditor().getText())) {
+                    comboBox.getSelectionModel().select(item); //which selects the item.
+                    break;
+                }
+            }
+        });
 
+        comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            @Override public void changed(ObservableValue<? extends String> selected, String oldValue, String newValue) {
+                System.out.println("Selected: " + newValue);
+                comboBox.setVisible(false);
+                textArea.insertText(textArea.getCaretPosition(), newValue);
+            }
+        });
+        anchorPaneForTextArea.getChildren().add(comboBox);
         new Thread(() -> {
             try {
                 autoComplete.init();
@@ -73,6 +110,11 @@ public class RootLayoutController implements Initializable {
                 e.printStackTrace();
             }
         }).start();
+
+        File selectedDirectory = new File("../Autocompletion");
+        findFiles(selectedDirectory,treeView.getRoot());
+        treeView.setShowRoot(true);
+
     }
 
 
@@ -99,6 +141,7 @@ public class RootLayoutController implements Initializable {
 
     @FXML
     private void openFolder() {
+
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(new File("../"));
         File selectedDirectory = directoryChooser.showDialog(null);
@@ -110,7 +153,6 @@ public class RootLayoutController implements Initializable {
             findFiles(selectedDirectory,treeView.getRoot());
             treeView.setShowRoot(true);
             treeView.getRoot().setExpanded(false);
-
         }
 
     }
@@ -162,9 +204,13 @@ public class RootLayoutController implements Initializable {
     private void showSelectedFile() throws IOException {
         try {
             TreeItem<CustomItem> selectedItem = treeView.getSelectionModel().getSelectedItem();
-            if (selectedItem != null && selectedItem.getValue().getFile().isFile())
+            if (selectedItem != null && selectedItem.getValue().getFile().isFile()) {
                 textArea.setText(FileUtils.readFileToString(selectedItem.getValue().getFile()));
+                textArea.requestFocus();
+            }
         }catch (Exception e){}
+
+
     }
 
     public void onRun(ActionEvent actionEvent) {
@@ -194,6 +240,12 @@ public class RootLayoutController implements Initializable {
 
 
     public void onKeyPressedTextArea(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ESCAPE) {
+            comboBox.setVisible(false);
+            comboBox.hide();
+            return;
+        }
+
         if (keyEvent.getCode() != KeyCode.PERIOD) return;
 
         String ref = getCurrentRef();
@@ -208,8 +260,28 @@ public class RootLayoutController implements Initializable {
             String classWithPackage = addPackage(code, classWithoutPackage);
 
             try {
+//                chooseDialogController.addDataIntoTable(autoComplete.getMethods(classWithPackage));
+//                window.showChooseDialog();
+                Bounds localBounds = textArea.localToScene(textArea.getBoundsInLocal());
+                ReadOnlyIntegerProperty readOnlyIntegerProperty = textArea.caretPositionProperty();
+                comboBox.setLayoutY(0d);
+
+                comboBox.setVisible(true);
+                comboBox.setFocusTraversable(true);
                 System.out.println("classWithPackage = " + classWithPackage);
-                System.out.println(Arrays.toString(autoComplete.getMethods(classWithPackage)));
+                Method[] methods = autoComplete.getMethods(classWithPackage);
+//                comboBox.getItems().addAll(Arrays.<String>asList(methods));
+                comboBox.getItems().clear();
+                for (Method method : methods) {
+                    Parameter[] parameters = method.getParameters();
+                    List<String> params = new ArrayList<>();
+                    for (Parameter parameter : parameters) params.add(parameter.getName());
+                    comboBox.getItems().add(method.getName() + "(" + StringUtils.join(params,",") + ");");
+                }
+
+                comboBox.setLayoutX(textArea.getWidth()-comboBox.getWidth()-100);
+                comboBox.show();
+                System.out.println(Arrays.toString(methods));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -238,10 +310,8 @@ public class RootLayoutController implements Initializable {
     }
 
     private String addPackage(String code, String classWithoutPackage) {
-        System.out.println("classWithoutPackage = " + classWithoutPackage);
         Set<String> userImportClasses = getUserImportClases(code);
         for (String userImportClass : userImportClasses) {
-            System.out.println("userImportClass = " + userImportClass);
             String[] split = userImportClass.replace(".", " ").split(" ");
             String userImportType = split[split.length - 1];
             if (userImportType.equals(classWithoutPackage)) {
@@ -256,9 +326,6 @@ public class RootLayoutController implements Initializable {
                          }
                      }
                  }
-
-
-
             }
 
         }
