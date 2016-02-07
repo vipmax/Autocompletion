@@ -35,7 +35,7 @@ public class AutoComplete {
 
     private static String getUserCode() throws IOException {
         File file = new File("src/main/java/AutoComplete.java");
-//	file.createTempFile(arg0,arg1);
+// file.
         String code = FileUtils.readFileToString(file);
         System.out.println(code);
         return code;

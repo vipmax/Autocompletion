@@ -42,7 +42,7 @@ public class RootLayoutController implements Initializable {
     @FXML
     private AnchorPane anchorPaneForTextArea;
 
-    private ComboBox<String> comboBox;
+    private ComboBox<ComboBoxCustomItem> comboBox;
 
 
     AutoComplete autoComplete = new AutoComplete();
@@ -79,25 +79,20 @@ public class RootLayoutController implements Initializable {
         });
 //        comboBox.
         treeView.setRoot(new TreeItem<>(new CustomItem("projects", null), new ImageView(folderImage)));
-        comboBox = new ComboBox<>();
+        comboBox = new ComboBox<ComboBoxCustomItem>();
         comboBox.setVisible(false);
         comboBox.setEditable(true);
         comboBox.setOnKeyReleased(t -> {
             comboBox.requestFocus();
             comboBox.show();
-            for (String item : comboBox.getItems()) {
-                if (item.startsWith(comboBox.getEditor().getText())) {
-                    comboBox.getSelectionModel().select(item); //which selects the item.
-                    break;
-                }
-            }
         });
 
-        comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override public void changed(ObservableValue<? extends String> selected, String oldValue, String newValue) {
+        comboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ComboBoxCustomItem>() {
+            @Override
+            public void changed(ObservableValue<? extends ComboBoxCustomItem> observable, ComboBoxCustomItem oldValue, ComboBoxCustomItem newValue) {
                 System.out.println("Selected: " + newValue);
                 comboBox.setVisible(false);
-                textArea.insertText(textArea.getCaretPosition(), newValue);
+                textArea.insertText(textArea.getCaretPosition(), (newValue.getMethodName() + "(" + ")"));
             }
         });
         anchorPaneForTextArea.getChildren().add(comboBox);
@@ -270,14 +265,19 @@ public class RootLayoutController implements Initializable {
                 comboBox.setFocusTraversable(true);
                 System.out.println("classWithPackage = " + classWithPackage);
                 Method[] methods = autoComplete.getMethods(classWithPackage);
-//                comboBox.getItems().addAll(Arrays.<String>asList(methods));
+
                 comboBox.getItems().clear();
                 for (Method method : methods) {
                     Parameter[] parameters = method.getParameters();
-                    List<String> params = new ArrayList<>();
-                    for (Parameter parameter : parameters) params.add(parameter.getName());
-                    comboBox.getItems().add(method.getName() + "(" + StringUtils.join(params,",") + ");");
+                    List<ComboBoxCustomItem.Tuple2> params = new ArrayList<>();
+                    for (Parameter parameter : parameters){
+                        params.add(new ComboBoxCustomItem.Tuple2(parameter.getParameterizedType().getTypeName(),parameter.getName()));
+                    }
+
+                    comboBox.getItems().add(new ComboBoxCustomItem(method.getName(), params,
+                                                                   method.getGenericReturnType().getTypeName()));
                 }
+
 
                 comboBox.setLayoutX(textArea.getWidth()-comboBox.getWidth()-100);
                 comboBox.show();
