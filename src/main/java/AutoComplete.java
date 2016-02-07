@@ -21,7 +21,7 @@ import java.util.zip.ZipInputStream;
 public class AutoComplete {
 
     Map<String, String> classes = new HashMap<>();
-
+ 
 
     public static void main(String[] args) throws Exception {
         AutoComplete autoComplete = new AutoComplete();
@@ -35,7 +35,7 @@ public class AutoComplete {
 
     private static String getUserCode() throws IOException {
         File file = new File("src/main/java/AutoComplete.java");
-// file.
+// file
         String code = FileUtils.readFileToString(file);
         System.out.println(code);
         return code;

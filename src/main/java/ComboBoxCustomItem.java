@@ -67,14 +67,12 @@ public class ComboBoxCustomItem {
             for (;stringBuilder2.length() + methodReturnType.length()<=MAX_LENGHT; ) stringBuilder2.append(" ");
 
             stringBuilder2.append("  ").append(methodReturnType);
-            System.out.println("stringBuilder! = " + stringBuilder2.toString());
             return stringBuilder2.toString();
         }
 
         for (;stringBuilder.length() + methodReturnType.length()<=MAX_LENGHT; ) stringBuilder.append(" ");
 
         stringBuilder.append("  ").append(methodReturnType);
-        System.out.println("stringBuilder! = " + stringBuilder.toString());
 
         return stringBuilder.toString();
     }

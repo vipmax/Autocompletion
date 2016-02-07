@@ -1,10 +1,9 @@
-import com.sun.deploy.util.StringUtils;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
@@ -15,8 +14,6 @@ import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedReader;
@@ -241,8 +238,15 @@ public class RootLayoutController implements Initializable {
             return;
         }
 
-        if (keyEvent.getCode() != KeyCode.PERIOD) return;
+        textArea.getScene().getAccelerators().put( new KeyCodeCombination(KeyCode.SPACE, KeyCombination.CONTROL_ANY),
+                () -> {addDataInComboBox(); } );
 
+        if (keyEvent.getCode() == KeyCode.PERIOD) addDataInComboBox();
+
+
+    }
+
+    private void addDataInComboBox() {
         String ref = getCurrentRef();
         if (ref==null) return;
 
@@ -255,8 +259,7 @@ public class RootLayoutController implements Initializable {
             String classWithPackage = addPackage(code, classWithoutPackage);
 
             try {
-//                chooseDialogController.addDataIntoTable(autoComplete.getMethods(classWithPackage));
-//                window.showChooseDialog();
+
                 Bounds localBounds = textArea.localToScene(textArea.getBoundsInLocal());
                 ReadOnlyIntegerProperty readOnlyIntegerProperty = textArea.caretPositionProperty();
                 comboBox.setLayoutY(0d);
